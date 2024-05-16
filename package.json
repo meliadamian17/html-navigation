@@ -28,12 +28,12 @@
     "keybindings": [
       {
         "command": "extension.jumpToNextAttribute",
-        "key": "ctrl+shift+a",
+        "key": "option+shift+a",
         "when": "editorTextFocus"
       },
       {
         "command": "extension.jumpToContent",
-        "key": "ctrl+shift+c",
+        "key": "option+shift+c",
         "when": "editorTextFocus"
       }
     ]

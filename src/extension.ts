@@ -1,55 +1,58 @@
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-  context.subscriptions.push(
-    vscode.commands.registerCommand('extension.jumpToNextAttribute', () => {
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const document = editor.document;
-        const position = editor.selection.active;
+  console.log('HTML Navigation Extension activated');
 
-        // Debug log
-        console.log('Jump to Next Attribute command triggered');
+  const jumpToNextAttribute = vscode.commands.registerCommand('extension.jumpToNextAttribute', () => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const document = editor.document;
+      const position = editor.selection.active;
 
-        const text = document.getText(new vscode.Range(position, document.lineAt(position.line).range.end));
-        const match = text.match(/(\s+\w+=)/);
-        if (match) {
-          const newPosition = position.translate(0, match.index! + match[0].length);
-          editor.selection = new vscode.Selection(newPosition, newPosition);
-          editor.revealRange(new vscode.Range(newPosition, newPosition));
-        } else {
-          console.log('No attribute found on this line.');
-        }
+      console.log('Jump to Next Attribute command triggered at position:', position.character);
+
+      const text = document.getText(new vscode.Range(position, document.lineAt(position.line).range.end));
+      const match = text.match(/(\s+\w+=)/);
+      if (match) {
+        const newPosition = position.translate(0, match.index! + match[0].length);
+        console.log('Calculated new position for Next Attribute:', newPosition.character);
+        editor.selection = new vscode.Selection(newPosition, newPosition);
+        editor.revealRange(new vscode.Range(newPosition, newPosition));
       } else {
-        console.log('No active editor found.');
+        console.log('No attribute found on this line.');
       }
-    })
-  );
+    } else {
+      console.log('No active editor found.');
+    }
+  });
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('extension.jumpToContent', () => {
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const document = editor.document;
-        const position = editor.selection.active;
+  const jumpToContent = vscode.commands.registerCommand('extension.jumpToContent', () => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const document = editor.document;
+      const position = editor.selection.active;
 
-        // Debug log
-        console.log('Jump to Content command triggered');
+      console.log('Jump to Content command triggered at position:', position.character);
 
-        const text = document.getText(new vscode.Range(position, document.lineAt(position.line).range.end));
-        const match = text.match(/>/);
-        if (match) {
-          const newPosition = position.translate(0, match.index! + 1);
-          editor.selection = new vscode.Selection(newPosition, newPosition);
-          editor.revealRange(new vscode.Range(newPosition, newPosition));
-        } else {
-          console.log('No closing tag found on this line.');
-        }
+      const text = document.getText(new vscode.Range(position, document.lineAt(position.line).range.end));
+      const match = text.match(/>/);
+      if (match) {
+        const newPosition = position.translate(0, match.index! + 1);
+        console.log('Calculated new position for Content:', newPosition.character);
+        editor.selection = new vscode.Selection(newPosition, newPosition);
+        editor.revealRange(new vscode.Range(newPosition, newPosition));
       } else {
-        console.log('No active editor found.');
+        console.log('No closing tag found on this line.');
       }
-    })
-  );
+    } else {
+      console.log('No active editor found.');
+    }
+  });
+
+  context.subscriptions.push(jumpToNextAttribute);
+  context.subscriptions.push(jumpToContent);
 }
 
-export function deactivate() {}
+export function deactivate() {
+  console.log('HTML Navigation Extension deactivated');
+}

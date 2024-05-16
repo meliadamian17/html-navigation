@@ -1,15 +1,48 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
 
 suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+  vscode.window.showInformationMessage('Start all tests.');
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+  test('Jump to Next Attribute Command', async () => {
+    const document = await vscode.workspace.openTextDocument({
+      content: '<div class="test" id="test-id"></div>',
+      language: 'html',
+    });
+    await vscode.window.showTextDocument(document);
+
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const position = new vscode.Position(0, 5); // Position after <div
+      editor.selection = new vscode.Selection(position, position);
+      console.log('Initial position for Jump to Next Attribute:', editor.selection.active.character);
+
+      await vscode.commands.executeCommand('extension.jumpToNextAttribute');
+      const newPosition = editor.selection.active;
+      console.log('New position for Jump to Next Attribute:', newPosition.character);
+
+      assert.strictEqual(newPosition.character, 12); // Expected position after class=
+    }
+  });
+
+  test('Jump to Content Command', async () => {
+    const document = await vscode.workspace.openTextDocument({
+      content: '<div class="test" id="test-id"></div>',
+      language: 'html',
+    });
+    await vscode.window.showTextDocument(document);
+
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const position = new vscode.Position(0, 28); // Position after id=
+      editor.selection = new vscode.Selection(position, position);
+      console.log('Initial position for Jump to Content:', editor.selection.active.character);
+
+      await vscode.commands.executeCommand('extension.jumpToContent');
+      const newPosition = editor.selection.active;
+      console.log('New position for Jump to Content:', newPosition.character);
+
+      assert.strictEqual(newPosition.character, 30); // Expected position inside <div>
+    }
+  });
 });
